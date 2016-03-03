@@ -4,8 +4,7 @@
 
 (function($) {
 	var currentElmClasses = []; 
-    var originalElmClasses = [];
-    
+    var curElm;
     
  
     
@@ -28,39 +27,33 @@
             function setSelectedElementInfo(){
                 /*Get current element from dev tools*/                
                 chrome.devtools.inspectedWindow.eval('('+getObject.toString()+')($0)', function(obj, exc) {
-                    if(obj) {                            
+                    if(obj) {    
+                        curElm = obj;                        
                         currentElmClasses = [];
-                        originalElmClasses = [];
                         originalClasses.empty(); 
-                        if(obj && obj.class) {                                
-                                                           
-                            $.map(obj.class.split(' '), function(cls, n) {
-                                
+                        if(curElm && curElm.class) {                                
+                            storeOriginalClasses();                               
+                            $.map(curElm.class.split(' '), function(cls, n) {                                
                                 originalClasses.html(originalClasses.html() + cls + '<br />');
                                 currentElmClasses.push(cls);
-                                originalElmClasses.push(cls);
                             });
                             $('#fabricClassGroup').val("");
-                            setAvailableClassChoices();                                
-                            
+                            setAvailableClassChoices();                                                            
                         }                           
                         
-                    } else {
-                        
+                    } else {                        
                         originalClasses.html('');
                     }
                 });
             }
          function registerGroupChangeHandler(){
             $('#fabricClassGroup').on('change', function(e) {
-                setAvailableClassChoices();
-                    
-                            
+                setAvailableClassChoices();                             
             });
          }
          
          function setAvailableClassChoices(){
-             availableClasses.html("");
+             availableClasses.empty();
              var selectControl = $('#fabricClassGroup')[0];
              var selectedGroupValue = selectControl[selectControl.selectedIndex].value;
              if(selectedGroupValue === ""){ 
@@ -87,33 +80,18 @@
                     }
                     else{
                         currentElmClasses.push(this.name);
-                    }
-                   
+                    }                   
                 });
         }
         
-        function init(){
-           
+        function init(){           
             registerGroupChangeHandler();
             $('#resetBtn').on('click', resetClasses);
             $('#launcher').on('click', doLaunch);
-            $('#launcher2').on('click', doLaunch2);
-            
+            $('#launcher2').on('click', doLaunch2);            
         }
         
-        function resetClasses(){
-            // currentElmClasses.forEach(function(val, idx){
-            //     toggleClass(val);
-            //     
-            // });
-            
-            clearClasses();
-             currentElmClasses = originalElmClasses;
-            originalElmClasses.forEach(function(val, idx){
-                 toggleClass(val);
-             })
-            setAvailableClassChoices();
-        }
+        
 
 		function getObject(obj){
 			/*get current element from dev tools and return element attributes and tagName*/
@@ -125,16 +103,13 @@
 		}
 
 		function toggleClass(cls) {
-			/*Calling toggle class function in content.js with current element from dev tools and classes that need to toggle*/
-			
+			/*Calling toggle class function in content.js with current element from dev tools and classes that need to toggle*/			
             if(chrome
             && chrome.devtools
             && chrome.devtools.inspectedWindow){
                
-                chrome.devtools.inspectedWindow.eval('FabricExplorer.toggleClass($0, "'+cls+'")', {useContentScriptContext: true});
-                
-            }
-           
+                chrome.devtools.inspectedWindow.eval('FabricExplorer.toggleClass($0, "'+cls+'")', {useContentScriptContext: true});                
+            }           
 		}
         
         function clearClasses(cls) {
@@ -144,24 +119,36 @@
             && chrome.devtools
             && chrome.devtools.inspectedWindow){
                 chrome.devtools.inspectedWindow.eval('FabricExplorer.clearClasses($0)', {useContentScriptContext: true});
+            }           
+		}
+        
+        function resetClasses() {
+			if(chrome
+            && chrome.devtools
+            && chrome.devtools.inspectedWindow){
+                chrome.devtools.inspectedWindow.eval('FabricExplorer.resetOriginalClasses($0)', {useContentScriptContext: true});
             }
-           
+            currentElmClasses = originalClasses.html().split('<br>');
+            setAvailableClassChoices();
+		}
+        
+        function storeOriginalClasses() {
+			if(chrome
+            && chrome.devtools
+            && chrome.devtools.inspectedWindow){
+                chrome.devtools.inspectedWindow.eval('FabricExplorer.storeOriginalClasses($0)', {useContentScriptContext: true});
+            }
 		}
         
         function doLaunch(){
             
             var newUrl = 'http://www.sector43.com';
-            window.open(newUrl, '_blank');
-          
-            
+            window.open(newUrl, '_blank');          
         }
         
-        function doLaunch2(){
-            
+        function doLaunch2(){            
             var newUrl = 'http://www.sector43.com/pluralsight-training-videos/';
-            window.open(newUrl, '_blank');
-          
-            
+            window.open(newUrl, '_blank');          
         }
 
         init();
