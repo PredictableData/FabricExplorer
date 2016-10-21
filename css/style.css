@@ -20,10 +20,16 @@
 }
 
 #title{
-    font-size: 12pt;
+    font-size: 11pt;
     color:#B11015;
     font-weight:bold;
     text-align: center;
+    width:100%;
+}
+
+#links{
+    font-size: 8pt;    
+    text-align: right;
     width:100%;
 }
 
@@ -34,4 +40,8 @@
 .tools{
   padding: 10px 0 10px 0;  
   
+}
+
+.version{
+    font-size:9pt;
 }

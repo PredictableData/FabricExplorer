@@ -17,6 +17,7 @@
             
 		},
         clearClasses: function(obj){
+            
             $(obj).removeAttr('class');
         },
         storeOriginalClasses: function(obj){
@@ -27,12 +28,23 @@
             }
         },
         resetOriginalClasses: function(obj){
-            var $o = $(obj);
-            this.clearClasses();
-            var attr = $o.attr('loadClass');
-            if (typeof attr !== 'undefined' && attr !== false) {
-                $o.attr('class', $o.attr('loadClass'))
+            
+            try{
+                
+                this.clearClasses(obj);
+                var $o = $(obj);
+                
+                var attr = $o.attr('loadClass');
+                if (typeof attr !== 'undefined' && attr !== false) {
+
+                    $o.attr('class', $o.attr('loadClass'))
+                }
             }
+            catch(err){
+                
+                logMsg(err);
+            }
+            
         }
            
 	}

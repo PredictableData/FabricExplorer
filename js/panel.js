@@ -5,6 +5,7 @@
 (function($) {
 	var currentElmClasses = []; 
     var curElm;
+    var counter = 0;
     var FabricClasses={
         "Font" : [],
         "FontSize" : [],
@@ -91,10 +92,11 @@
             
             availableClasses.find('input').on('mousedown', 
                 function() {
-                      logMsg('down');
+                      //logMsg('down');
                       var prevClassName = $(availableClasses.find('input:checked')).attr('data-className');
-                      logMsg('prev:' + prevClassName); 
-                      if("undefined" !== typeof prevClassName && prevClassName.indexOf('ms-u-' === -1)){
+                      //logMsg('prev:' + prevClassName); 
+                      if("undefined" !== typeof prevClassName && prevClassName.indexOf('ms-u-') === -1){
+                            //logMsg('removing ' + prevClassName);
                             toggleClass(prevClassName);
                             var index = currentElmClasses.indexOf(prevClassName);
                             if (index > -1) {
@@ -106,22 +108,25 @@
                       }            
                 }).on('mouseup',
                 function() {
-                    logMsg('up');
+                    //logMsg('up');
                     try{
                         var className = $(this).attr('data-className');
-                        logMsg('new: ' + className);
+                        //logMsg('new: ' + className);
                     }
                     catch(err){
                         logMsg(err);
                     }
-                    toggleClass(className);
-                    var index = currentElmClasses.indexOf(className);
-                    if (index > -1) {
-                        currentElmClasses.splice(index, 1);
-                    }
-                    else{
-                        currentElmClasses.push(className);
-                    }   
+                    if("undefined" !== typeof className /*&& prevClassName.indexOf('ms-u-' === -1)*/){
+                        //logMsg('adding ' + className);
+                        toggleClass(className);
+                        var index = currentElmClasses.indexOf(className);
+                        if (index > -1) {
+                            currentElmClasses.splice(index, 1);
+                        }
+                        else{
+                            currentElmClasses.push(className);
+                        } 
+                   }  
                 });
         }
         
@@ -129,7 +134,8 @@
             registerGroupChangeHandler();
             $('#resetBtn').on('click', resetClasses);
             $('#launcher').on('click', doLaunch);
-            $('#launcher2').on('click', doLaunch2);            
+            $('#launcher2').on('click', doLaunch);            
+            $('#launcher3').on('click', doLaunch);
             $('#initBtn').on('click', initClasses);
             initClasses();
         }
@@ -149,6 +155,9 @@
 
 		function toggleClass(cls) {
 			/*Calling toggle class function in content.js with current element from dev tools and classes that need to toggle*/			
+            if("undefined" === typeof cls){
+                return;
+            }
             if(chrome
             && chrome.devtools
             && chrome.devtools.inspectedWindow){
@@ -168,38 +177,49 @@
 		}
         
         function resetClasses() {
-			if(chrome
+			
+            if(chrome
             && chrome.devtools
             && chrome.devtools.inspectedWindow){
+                
                 chrome.devtools.inspectedWindow.eval('FabricExplorer.resetOriginalClasses($0)', {useContentScriptContext: true});
+                
             }
+            
             currentElmClasses = originalClasses.html().split('<br>');
             setAvailableClassChoices();
 		}
 
         function initClasses(){
-            
-            chrome.storage.local.get('FabEx', function(items) {
-                FabricClasses = JSON.parse(items.FabEx);    
-                if(!FabricClasses || !FabricClasses.Font || !FabricClasses.Font.length || 0 === FabricClasses.Font.length){
+            $('#availableClassCount').text("0");
+            //chrome.storage.local.get('FabEx', function(items) {
+                //FabricClasses = JSON.parse(items.FabEx);    
+                //if(!FabricClasses || !FabricClasses.Font || !FabricClasses.Font.length || 0 === FabricClasses.Font.length){
                     getClassesFromPage();                
-                }
-                var classCount = 0;
+                //}
+                
+                
 
-                ["Font", "FontSize", "FontWeight", "FontColor", "BGColor", "BorderColor", "Icon", "Animation", "Grid", "Utils"].forEach(function(element) {
+                //["Font", "FontSize", "FontWeight", "FontColor", "BGColor", "BorderColor", "Icon", "Animation", "Grid", "Utils"].forEach(function(element) {
                     
-                    if(FabricClasses[element].length && FabricClasses[element].length > 0){
-                        for(var i=0;i<FabricClasses[element].length;i++){
-                            classCount++;
-                        }
-                    }
-                }, this);
-                $('#availableClassCount').text(classCount)
-            });
+                    //if(FabricClasses[element].length && FabricClasses[element].length > 0){
+                        //for(var i=0;i<FabricClasses[element].length;i++){
+                            //classCount++;
+                        //}
+                    //}
+                //}, this);
+                var id = setInterval(function(){
+                    if(0<counter){
+                        $('#availableClassCount').text(counter)
+                        clearInterval(id);
+                }}, 1000);
+                
+            //});
         }
 
         function getClassesFromPage(){
             logMsg("getting Classes from page");
+                counter=0;
                 chrome.devtools.inspectedWindow.eval('('+initClasses2.toString()+')()', function(obj) {
                     
                     
@@ -221,59 +241,73 @@
                               let oneClass = obj[i];
                                if(oneClass.substring(0,13)=== ".ms-fontSize-"){
                                   FabricClasses.FontSize.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,9)=== ".ms-font-"){
                                   FabricClasses.Font.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                              
                               if(oneClass.substring(0,15)=== ".ms-fontWeight-"){
                                   FabricClasses.FontWeight.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,14)=== ".ms-fontColor-"){
                                   FabricClasses.FontColor.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,12)=== ".ms-bgColor-"){
                                   FabricClasses.BGColor.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,16)=== ".ms-borderColor-"){
                                   FabricClasses.BorderColor.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,10)=== ".ms-Icon--"){
                                   FabricClasses.Icon.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,8)=== ".ms-u-sm"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,8)=== ".ms-u-md"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,8)=== ".ms-u-lg"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,8)=== ".ms-u-xl"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,9)=== ".ms-u-xxl"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,10)=== ".ms-u-xxxl"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,11)=== ".ms-u-hidden"){
                                   FabricClasses.Grid.push(parseClass(oneClass));
+                                  counter++;
                                   continue;
                               }
                               if(oneClass.substring(0,6)=== ".ms-u-"){
@@ -289,20 +323,21 @@
                                   else{
                                       FabricClasses.Utils.push(parseClass(oneClass));
                                   }  
-                                  
-                                  
+                                  counter++;
                                   continue;
                               }
                           } 
-                          chrome.storage.local.remove("FabEx");
-                          chrome.storage.local.set({"FabEx" :  JSON.stringify(FabricClasses)});
-                          logMsg('done storing');                          
+                          logMsg('Done getting classes from page-' + counter + "/" + obj.length);
+                          
+                          //chrome.storage.local.remove("FabEx");
+                          //chrome.storage.local.set({"FabEx" :  JSON.stringify(FabricClasses)});
+                          //logMsg('done storing');                          
                     } else {                        
-                        alert('nada');
+                        alert('No Fabric classes found on current page - please check your stylesheet refrences');
+                        
                     }
                 });
            
-
         }
 
         function parseClass(oneClass){
@@ -354,15 +389,15 @@
 		}
         
         function doLaunch(){
-            
-            var newUrl = 'http://www.sector43.com';
-            window.open(newUrl, '_blank');          
+            var url = ($(this).attr('data-href'));
+            window.open(url, '_blank');          
         }
         
-        function doLaunch2(){            
-            var newUrl = 'http://www.sector43.com/pluralsight-training-videos/';
-            window.open(newUrl, '_blank');          
-        }
+        //function doLaunch2(){
+            //alert($(this).attr('href'));            
+            //var newUrl = 'http://www.sector43.com/pluralsight-training-videos/';
+            //window.open(newUrl, '_blank');          
+        //}
 
         init();
 	});
