@@ -12,9 +12,13 @@
 	
 </head>
 <body>
-	<div class='header'>
-        Part of the <a href='#' id='launcher2' >Introducing Office UI Fabric</a> course
+	<div id='title'>
+        Fabric Explorer (v2)    
+    </div>
+    <div class='header'>
+        Part of the <a href='#' id='launcher2' >Office UI Fabric training courses</a> from Pluralsight and Sector 43 Software.
 	</div>
+    
 		
 			<div class="containerLeft" >
                 <h2>Original Classes</h2>
@@ -26,19 +30,22 @@
                 <h2>Available Classes</h2>
                 <select id='fabricClassGroup' name="fabricClassGroup" >
                     <option value="" selected> -- Select --</option>
-                    <option value="fontSizes">Font Sizes</option>
-                    <option value="fontColors">Font Colors</option>
-                    <option value="fontWeights">Font Weight</option>
-                    <option value="bgColors">Background Colors</option>
-                    <option value="borderColors">Border Colors</option>
-                    <option value="icons">Icons</option>
-                    <option value="animation">Animation</option>
-                    <option value="grid">Grid</option>
+                    <option value="Font">Font Sizes</option>
+                    <option value="FontColor">Font Colors</option>
+                    <option value="FontWeight">Font Weight</option>
+                    <option value="BGColor">Background Colors</option>
+                    <option value="BorderColor">Border Colors</option>
+                    <option value="Icon">Icons</option>
+                    <option value="Animation">Animation</option>
+                    <option value="Grid">Grid</option>
                 </select>
                 <div id="availableClasses" class="container" ></div>
 			 </div>
              <br class="clearBoth" />
-             <br />
+             <div class='tools'>
+        <button id='initBtn'>ReInitialize Classes</button>
+        Fabric classes available: <span id='availableClassCount'>0</span>
+	</div>
              <div class='footer'>
                  &copy; 2016, <a href='#' id='launcher' >Sector43 Software</a>.                   
              </div>

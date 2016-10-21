@@ -33,7 +33,8 @@
             if (typeof attr !== 'undefined' && attr !== false) {
                 $o.attr('class', $o.attr('loadClass'))
             }
-        }      
+        }
+           
 	}
 
 	$(function() {
