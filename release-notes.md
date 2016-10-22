@@ -18,6 +18,7 @@
 * FabEx now reads the Fabric classes live from the target web page when it is loaded so if you have added or removed classes from the Fabric CSS classes, FabEx will reflect those changes.  This also allows:
   * Support for past and future versions of the Fabric CSS classes, providing that the naming standards for the classes don’t change (i.e. Font Weight class names all begin ms-fontWeight, Icon class names all begin ms-Icon--, etc.)
   * Eventual expansion into other frameworks – i.e Bootstrap, etc.
+* Changed to radio buttons when selecting classes that only allow one class to be assigned
 * Ability to manually reload Fabric classes from web page if desired (although I’m not sure why you would do this…)
 * Provides information on how many Fabric classes are available in the target web page
 * Minor bug fixes and code cleanup
