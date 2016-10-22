@@ -2,25 +2,27 @@
 <html id="page-styles" lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Fabric Explorer</title>
 	<link rel="stylesheet" href="css/style.css">
     <script src="js/jQuery2.1.4.min.js"></script>
 	<script src="js/functions.js"></script>
     <script src="js/panel.js"></script>
-    <script src="js/classNames.js"></script>
+    
     
 	
 </head>
 <body>
-	<div id='title'>
-        Fabric Explorer <span class='version'>v2</span>)    
-    </div>
     <div id='links'>
-        <a href='#'  data-href='https://github.com/Sector43/FabricExplorer/blob/master/release-notes.md' id='launcher3' >Help</a>   
+        <a href='#' data-href='http://www.sector43.com/pluralsight-training-videos/' class='launcher' >
+            <img src='/icons/s43Bullet.png' height='16px' width='16px' alt='Sector43' title='Part of the Office UI Fabric training courses from <b>Sector 43 Software</b> and Pluralsight.' /></a>
+        <span id='helpLink'>
+                <a href='#'  data-href='https://github.com/Sector43/FabricExplorer/blob/master/release-notes.md' class='launcher'>Help</a>
+        </span>   
     </div>
-    <div class='header'>
-        Part of the <a href='#' data-href='http://www.sector43.com/pluralsight-training-videos/' id='launcher2' >Office UI Fabric training courses</a> from Sector 43 Software and Pluralsight.
-	</div>
+	<div id='title'>
+        Fabric Explorer <span class='version'>v2</span>  
+    </div>
+    
     
 		
 			<div class="containerLeft" >
@@ -33,7 +35,7 @@
                 <h2>Available Classes</h2>
                 <select id='fabricClassGroup' name="fabricClassGroup" >
                     <option value="" selected> -- Select --</option>
-                    <option value="Font">Font Sizes</option>
+                    <option value="FontSize">Font Sizes</option>
                     <option value="FontColor">Font Colors</option>
                     <option value="FontWeight">Font Weight</option>
                     <option value="BGColor">Background Colors</option>
@@ -50,7 +52,7 @@
         Fabric classes available: <span id='availableClassCount'>0</span>
 	</div>
              <div class='footer'>
-                 &copy; 2016, <a href='#' data-href='http://www.sector43.com' id='launcher' >Sector43 Software</a>.                   
+                 &copy; 2016, <a href='#' data-href='http://www.sector43.com' class='launcher' >Sector43 Software</a>.                   
              </div>
 	</div>
 </body>

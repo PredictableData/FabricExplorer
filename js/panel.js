@@ -7,12 +7,10 @@
     var curElm;
     var counter = 0;
     var FabricClasses={
-        "Font" : [],
         "FontSize" : [],
         "FontWeight" : [],
         "FontColor" : [],
         "BGColor" : [],
-        "FontSize" : [],
         "BorderColor" : [],
         "Icon" : [],
         "Animation" : [],
@@ -23,80 +21,70 @@
  
     
     $(function() {
-		/*Define visible elements*/       
 		var originalClasses = $('#originalClasses');			
         var availableClasses = $('#availableClasses');			        
-        
-        setAvailableClassChoices()
-        
-
-		/*Add event on element selected*/
-        if(chrome
+        		
+        function setSelectedElementChangedListener(){
+            if(chrome
             && chrome.devtools
             && chrome.devtools.panels
             && chrome.devtools.panels.elements){
                 chrome.devtools.panels.elements.onSelectionChanged.addListener(setSelectedElementInfo);
             }
-
-            function setSelectedElementInfo(){
-                /*Get current element from dev tools*/                
-                chrome.devtools.inspectedWindow.eval('('+getObject.toString()+')($0)', function(obj, exc) {
-                    if(obj) {    
-                        curElm = obj;                        
-                        currentElmClasses = [];
-                        originalClasses.empty(); 
-                        if(curElm && curElm.class) {                                
-                            storeOriginalClasses();                               
-                            $.map(curElm.class.split(' '), function(cls, n) {                                
-                                originalClasses.html(originalClasses.html() + cls + '<br />');
-                                currentElmClasses.push(cls);
-                            });
-                            $('#fabricClassGroup').val("");
-                            setAvailableClassChoices();                                                            
-                        }                           
-                        
-                    } else {                        
-                        originalClasses.html('');
-                    }
-                });
-            }
-         function registerGroupChangeHandler(){
+        }
+        
+        function setSelectedElementInfo(){
+            chrome.devtools.inspectedWindow.eval('('+getObjectInfo.toString()+')($0)', function(obj, exc) {
+                if(obj) {    
+                    curElm = obj;                        
+                    currentElmClasses = [];
+                    originalClasses.empty(); 
+                    if(curElm && curElm.class) {                                
+                        storeOriginalClasses();                               
+                        $.map(curElm.class.split(' '), function(cls, n) {                                
+                            originalClasses.html(originalClasses.html() + cls + '<br />');
+                            currentElmClasses.push(cls);
+                        });
+                        $('#fabricClassGroup').val("");
+                        setAvailableClassChoices();                                                            
+                    }                           
+                    
+                } else {                        
+                    originalClasses.html('');
+                }
+            });
+        }
+        function registerGroupChangeHandler(){
             $('#fabricClassGroup').on('change', function(e) {
                 setAvailableClassChoices();                             
             });
-         }
+        }
          
-         function setAvailableClassChoices(){
-             availableClasses.empty();
-             var selectControl = $('#fabricClassGroup')[0];
-             var selectedGroupValue = selectControl[selectControl.selectedIndex].value;
-             if(selectedGroupValue === ""){ 
-                 return;
-             }
-             var classesList = FabricClasses[selectedGroupValue];
-             //logMsg(classesList);
-              $.map(classesList, function(cls, n) {
-                    let checkedString = "";
-                    if(currentElmClasses.indexOf(cls) > -1){
-                        checkedString = "checked='checked'";
-                    }
-                    let ctrlType = ("Grid" === selectedGroupValue)? "checkbox" : "radio";
-                    let ctrlString='<input id="'+selectedGroupValue+'-'+n+'" type="'+ctrlType+'" data-className="'+cls+'" name="'+selectedGroupValue+'-Choices" ' + checkedString + '><label for="class-'+n+'">'+cls+'</label><br />';
-                    //logMsg(ctrlString);
-                    availableClasses.html(availableClasses.html() + ctrlString);
-                });
-                registerClassChangeHandler();
-         }
+        function setAvailableClassChoices(){
+            availableClasses.empty();
+            var selectControl = $('#fabricClassGroup')[0];
+            var selectedGroupValue = selectControl[selectControl.selectedIndex].value;
+            if(selectedGroupValue === ""){ 
+                return;
+            }
+            var classesList = FabricClasses[selectedGroupValue];
+            $.map(classesList, function(cls, n) {
+                let checkedString = "";
+                if(currentElmClasses.indexOf(cls) > -1){
+                    checkedString = "checked='checked'";
+                }
+                let ctrlType = ("Grid" === selectedGroupValue)? "checkbox" : "radio";
+                let ctrlString='<input id="'+selectedGroupValue+'-'+n+'" type="'+ctrlType+'" data-className="'+cls+'" name="'+selectedGroupValue+'-Choices" ' + checkedString + '><label for="class-'+n+'">'+cls+'</label><br />';
+                availableClasses.html(availableClasses.html() + ctrlString);
+            });
+            registerClassChangeHandler();
+        }
          
-        function registerClassChangeHandler(){
-            
+        function registerClassChangeHandler(){            
             availableClasses.find('input').on('mousedown', 
                 function() {
-                      //logMsg('down');
                       var prevClassName = $(availableClasses.find('input:checked')).attr('data-className');
-                      //logMsg('prev:' + prevClassName); 
                       if("undefined" !== typeof prevClassName && prevClassName.indexOf('ms-u-') === -1){
-                            //logMsg('removing ' + prevClassName);
                             toggleClass(prevClassName);
                             var index = currentElmClasses.indexOf(prevClassName);
                             if (index > -1) {
@@ -108,16 +96,13 @@
                       }            
                 }).on('mouseup',
                 function() {
-                    //logMsg('up');
                     try{
                         var className = $(this).attr('data-className');
-                        //logMsg('new: ' + className);
                     }
                     catch(err){
                         logMsg(err);
                     }
                     if("undefined" !== typeof className /*&& prevClassName.indexOf('ms-u-' === -1)*/){
-                        //logMsg('adding ' + className);
                         toggleClass(className);
                         var index = currentElmClasses.indexOf(className);
                         if (index > -1) {
@@ -133,17 +118,15 @@
         function init(){           
             registerGroupChangeHandler();
             $('#resetBtn').on('click', resetClasses);
-            $('#launcher').on('click', doLaunch);
-            $('#launcher2').on('click', doLaunch);            
-            $('#launcher3').on('click', doLaunch);
+            $('.launcher').on('click', doLaunch);
+            
             $('#initBtn').on('click', initClasses);
             initClasses();
         }
         
         
 
-		function getObject(obj){
-			/*get current element from dev tools and return element attributes and tagName*/
+		function getObjectInfo(obj){
 			return {
 				id: obj.id,
 				class: obj.className,
@@ -153,34 +136,28 @@
 
         
 
-		function toggleClass(cls) {
-			/*Calling toggle class function in content.js with current element from dev tools and classes that need to toggle*/			
+		function toggleClass(cls) {		
             if("undefined" === typeof cls){
                 return;
             }
-            if(chrome
-            && chrome.devtools
-            && chrome.devtools.inspectedWindow){
-               
+            if(chromeInspectedWindowAvailable()){               
                 chrome.devtools.inspectedWindow.eval('FabricExplorer.toggleClass($0, "'+cls+'")', {useContentScriptContext: true});                
             }           
 		}
+
+        function chromeInspectedWindowAvailable(){
+            return chrome && chrome.devtools && chrome.devtools.inspectedWindow;
+        }
         
         function clearClasses(cls) {
-			/*Calling toggle class function in content.js with current element from dev tools and classes that need to toggle*/
-			
-            if(chrome
-            && chrome.devtools
-            && chrome.devtools.inspectedWindow){
+			if(chromeInspectedWindowAvailable()){
                 chrome.devtools.inspectedWindow.eval('FabricExplorer.clearClasses($0)', {useContentScriptContext: true});
             }           
 		}
         
         function resetClasses() {
 			
-            if(chrome
-            && chrome.devtools
-            && chrome.devtools.inspectedWindow){
+            if(chromeInspectedWindowAvailable()){
                 
                 chrome.devtools.inspectedWindow.eval('FabricExplorer.resetOriginalClasses($0)', {useContentScriptContext: true});
                 
@@ -192,29 +169,12 @@
 
         function initClasses(){
             $('#availableClassCount').text("0");
-            //chrome.storage.local.get('FabEx', function(items) {
-                //FabricClasses = JSON.parse(items.FabEx);    
-                //if(!FabricClasses || !FabricClasses.Font || !FabricClasses.Font.length || 0 === FabricClasses.Font.length){
-                    getClassesFromPage();                
-                //}
-                
-                
-
-                //["Font", "FontSize", "FontWeight", "FontColor", "BGColor", "BorderColor", "Icon", "Animation", "Grid", "Utils"].forEach(function(element) {
-                    
-                    //if(FabricClasses[element].length && FabricClasses[element].length > 0){
-                        //for(var i=0;i<FabricClasses[element].length;i++){
-                            //classCount++;
-                        //}
-                    //}
-                //}, this);
-                var id = setInterval(function(){
-                    if(0<counter){
-                        $('#availableClassCount').text(counter)
-                        clearInterval(id);
-                }}, 1000);
-                
-            //});
+            getClassesFromPage();                
+            var id = setInterval(function(){
+                if(0<counter){
+                    $('#availableClassCount').text(counter)
+                    clearInterval(id);
+                }}, 1000);                
         }
 
         function getClassesFromPage(){
@@ -225,12 +185,10 @@
                     
                     if(obj) {    
                           FabricClasses={
-                            "Font" : [],
                             "FontSize" : [],
                             "FontWeight" : [],
                             "FontColor" : [],
                             "BGColor" : [],
-                            "FontSize" : [],
                             "BorderColor" : [],
                             "Icon" : [],
                             "Animation" : [],
@@ -244,11 +202,11 @@
                                   counter++;
                                   continue;
                               }
-                              if(oneClass.substring(0,9)=== ".ms-font-"){
-                                  FabricClasses.Font.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
+                              //if(oneClass.substring(0,9)=== ".ms-font-"){
+                                  //FabricClasses.Font.push(parseClass(oneClass));
+                                  //counter++;
+                                  //continue;
+                              //}
                              
                               if(oneClass.substring(0,15)=== ".ms-fontWeight-"){
                                   FabricClasses.FontWeight.push(parseClass(oneClass));
@@ -327,11 +285,7 @@
                                   continue;
                               }
                           } 
-                          logMsg('Done getting classes from page-' + counter + "/" + obj.length);
-                          
-                          //chrome.storage.local.remove("FabEx");
-                          //chrome.storage.local.set({"FabEx" :  JSON.stringify(FabricClasses)});
-                          //logMsg('done storing');                          
+                          logMsg('Done getting classes from page-' + counter + "/" + obj.length);                                             
                     } else {                        
                         alert('No Fabric classes found on current page - please check your stylesheet refrences');
                         
@@ -358,8 +312,7 @@
             return retVal
         }
         
-        function initClasses2() {
-            
+        function initClasses2() {            
             var rules;
             var retVal = [];
             var cssFiles = document.styleSheets;
@@ -381,9 +334,7 @@
 
        
         function storeOriginalClasses() {
-			if(chrome
-            && chrome.devtools
-            && chrome.devtools.inspectedWindow){
+			if(chromeInspectedWindowAvailable()){
                 chrome.devtools.inspectedWindow.eval('FabricExplorer.storeOriginalClasses($0)', {useContentScriptContext: true});
             }
 		}
@@ -392,14 +343,10 @@
             var url = ($(this).attr('data-href'));
             window.open(url, '_blank');          
         }
-        
-        //function doLaunch2(){
-            //alert($(this).attr('href'));            
-            //var newUrl = 'http://www.sector43.com/pluralsight-training-videos/';
-            //window.open(newUrl, '_blank');          
-        //}
-
+               
         init();
+        setAvailableClassChoices();
+        setSelectedElementChangedListener();
 	});
     
     
