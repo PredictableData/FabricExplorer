@@ -177,6 +177,46 @@
                 }}, 1000);                
         }
 
+        function assignToClassGroup(oneClassName){
+            for(var j=0;j<FabExConfig.ClassGroups.length;j++){
+                if(oneClassName.indexOf(".") > 0){
+                    oneClassName = "." + oneClassName;
+                }
+                let oneGroup = FabExConfig.ClassGroups[j];
+                if(oneClassName.substring(oneGroup.beginTestPosition,oneGroup.endTestPosition)=== oneGroup.testString){
+                    addClassToGroup(oneGroup.name, oneClassName);
+                
+                    counter++;
+                    return true;
+                }
+
+            }
+            if(oneClassName.substring(0,6)=== ".ms-u-"){
+                if(oneClassName.indexOf('delay') > -1
+                || oneClassName.indexOf('expand') > -1
+                || oneClassName.indexOf('rotate') > -1
+                || oneClassName.indexOf('fade') > -1
+                || oneClassName.indexOf('scale') > -1
+                || oneClassName.indexOf('slide') > -1
+                ){
+                    addClassToGroup("Animation", oneClassName);
+                }
+                else{
+                    addClassToGroup("Utils", oneClassName);
+                }  
+                counter++;
+                return true;
+                                }
+            return false;
+        }
+
+        function addClassToGroup(group, className){
+            className = parseClass(className);
+            if(FabricClasses[group].indexOf(className) === -1){
+                FabricClasses[group].push(parseClass(className));
+            }
+        }
+
         function getClassesFromPage(){
             logMsg("getting Classes from page");
                 counter=0;
@@ -196,93 +236,25 @@
                             "Utils" : []        
                         }; 
                           for(var i=0;i<obj.length;i++){
-                              let oneClass = obj[i];
-                               if(oneClass.substring(0,13)=== ".ms-fontSize-"){
-                                  FabricClasses.FontSize.push(parseClass(oneClass));
-                                  counter++;
+                              if("undefined" === typeof obj[i]){
                                   continue;
                               }
-                              //if(oneClass.substring(0,9)=== ".ms-font-"){
-                                  //FabricClasses.Font.push(parseClass(oneClass));
-                                  //counter++;
-                                  //continue;
-                              //}
-                             
-                              if(oneClass.substring(0,15)=== ".ms-fontWeight-"){
-                                  FabricClasses.FontWeight.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
+                              try{
+                                    let classes = obj[i].split(' ');
+                                    for(var j=0;j<classes.length;j++){
+                                        let oneClassName = classes[j];
+                                        if(oneClassName.indexOf(".ms-u-md") > -1){
+                                            logMsg("md");
+                                        }
+                                        
+                                        if(assignToClassGroup(oneClassName)){
+                                            continue;
+                                        }
+                                    }
                               }
-                              if(oneClass.substring(0,14)=== ".ms-fontColor-"){
-                                  FabricClasses.FontColor.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,12)=== ".ms-bgColor-"){
-                                  FabricClasses.BGColor.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,16)=== ".ms-borderColor-"){
-                                  FabricClasses.BorderColor.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,10)=== ".ms-Icon--"){
-                                  FabricClasses.Icon.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,8)=== ".ms-u-sm"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,8)=== ".ms-u-md"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,8)=== ".ms-u-lg"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,8)=== ".ms-u-xl"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,9)=== ".ms-u-xxl"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,10)=== ".ms-u-xxxl"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,11)=== ".ms-u-hidden"){
-                                  FabricClasses.Grid.push(parseClass(oneClass));
-                                  counter++;
-                                  continue;
-                              }
-                              if(oneClass.substring(0,6)=== ".ms-u-"){
-                                  if(oneClass.indexOf('delay') > -1
-                                    || oneClass.indexOf('expand') > -1
-                                    || oneClass.indexOf('rotate') > -1
-                                    || oneClass.indexOf('fade') > -1
-                                    || oneClass.indexOf('scale') > -1
-                                    || oneClass.indexOf('slide') > -1
-                                  ){
-                                      FabricClasses.Animation.push(parseClass(oneClass));
-                                  }
-                                  else{
-                                      FabricClasses.Utils.push(parseClass(oneClass));
-                                  }  
-                                  counter++;
-                                  continue;
+                              catch(err){
+                                  logMsg(i);
+                                  logMsg(obj[i]);
                               }
                           } 
                           logMsg('Done getting classes from page-' + counter + "/" + obj.length);                                             
@@ -294,14 +266,18 @@
            
         }
 
-        function parseClass(oneClass){
-            let retVal = oneClass.replace('.', '');
+        function parseClass(oneClassName){
+            let retVal = oneClassName.replace('.', '');
             try{
                 let delim = retVal.indexOf(',');
                 if(delim > -1){
                     retVal = retVal.substring(0,delim);
                 }
                 delim = retVal.indexOf(':');
+                if(delim > -1){
+                    retVal = retVal.substring(0,delim);
+                }
+                delim = retVal.indexOf('--hover');
                 if(delim > -1){
                     retVal = retVal.substring(0,delim);
                 }
