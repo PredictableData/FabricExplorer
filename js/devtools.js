@@ -3,7 +3,6 @@
 	chrome.devtools.panels.elements.createSidebarPane(chrome.runtime.getManifest().name, function(sidebar) {
 		/*set panel page*/
 		sidebar.setPage('panel.html');
-		/*set panel height*/
-		sidebar.setHeight('500px'); 
+		
 	});
 })(jQuery);

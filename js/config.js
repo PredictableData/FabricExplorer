@@ -93,7 +93,7 @@
                     "name" : "Grid",
                     "beginTestPosition" : 0,
                     "endTestPosition" : 9,
-                    "testString" : ".ms-uxxl"
+                    "testString" : ".ms-u-xxl"
                 }
             );
             this.ClassGroups.push(
